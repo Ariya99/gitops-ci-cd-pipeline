@@ -6,7 +6,10 @@ RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
 
 FROM python:3.12-slim
 
-RUN useradd --create-home --shell /bin/bash appuser
+RUN apt-get update \
+    && apt-get upgrade -y --no-install-recommends \
+    && rm -rf /var/lib/apt/lists/* \
+    && useradd --create-home --shell /bin/bash appuser
 WORKDIR /app
 
 COPY --from=builder /install /usr/local
