@@ -46,6 +46,8 @@ jobs:
         run: bandit -r src -ll
 
       - name: Unit tests
+        env:
+          PYTHONPATH: .
         run: pytest tests/ -v
 
   build-scan-push:
