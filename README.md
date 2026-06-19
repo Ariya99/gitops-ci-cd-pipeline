@@ -3,7 +3,7 @@
 Production-grade GitOps CI/CD reference implementation demonstrating enterprise Kubernetes deployment maturity.
 
 **Author:** [Ariya99](https://github.com/Ariya99)
-
+![CI](https://github.com/Ariya99/gitops-ci-cd-pipeline/actions/workflows/ci.yml/badge.svg)
 ## Architecture
 
 ```
