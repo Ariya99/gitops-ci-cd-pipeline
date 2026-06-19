@@ -1,0 +1,56 @@
+replicaCount: 3
+
+image:
+  repository: ghcr.io/ariya99/gitops-ci-cd-pipeline
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  hosts:
+    - host: app.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: app-tls
+      hosts:
+        - app.example.com
+
+rollout:
+  enabled: true
+  canary:
+    steps:
+      - setWeight: 10
+      - pause: { duration: 3m }
+      - setWeight: 30
+      - pause: { duration: 3m }
+      - setWeight: 60
+      - pause: { duration: 3m }
+      - setWeight: 100
+    analysis:
+      enabled: true
+      successRate: 0.995
+      interval: 30s
+      count: 10
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 15
+  targetCPUUtilizationPercentage: 65
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 256Mi
+  limits:
+    cpu: 1000m
+    memory: 512Mi
+
+env:
+  - name: ENVIRONMENT
+    value: production

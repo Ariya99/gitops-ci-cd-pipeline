@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gitops-app-dashboard
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+    app.kubernetes.io/part-of: gitops-ci-cd-pipeline
+data:
+  gitops-app-overview.json: |
+    {
+      "annotations": { "list": [] },
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 0,
+      "id": null,
+      "links": [],
+      "panels": [
+        {
+          "title": "Request Rate",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+          "targets": [
+            {
+              "expr": "sum(rate(http_requests_total[5m])) by (endpoint)",
+              "legendFormat": "{{endpoint}}"
+            }
+          ]
+        },
+        {
+          "title": "Error Rate (5xx)",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+          "targets": [
+            {
+              "expr": "sum(rate(http_requests_total{status=~\"5..\"}[5m])) / sum(rate(http_requests_total[5m]))",
+              "legendFormat": "error ratio"
+            }
+          ]
+        },
+        {
+          "title": "Pod Restarts",
+          "type": "stat",
+          "gridPos": { "h": 4, "w": 6, "x": 0, "y": 8 },
+          "targets": [
+            {
+              "expr": "sum(kube_pod_container_status_restarts_total{namespace=~\"app-.*\"})"
+            }
+          ]
+        },
+        {
+          "title": "Rollout Status",
+          "type": "text",
+          "gridPos": { "h": 4, "w": 18, "x": 6, "y": 8 },
+          "options": {
+            "content": "Import rollout metrics from Argo Rollouts controller. Query: `rollout_info` and `rollout_phase`."
+          }
+        }
+      ],
+      "schemaVersion": 39,
+      "tags": ["gitops", "kubernetes", "argo-rollouts"],
+      "templating": { "list": [] },
+      "time": { "from": "now-1h", "to": "now" },
+      "title": "GitOps App Overview",
+      "uid": "gitops-app-overview",
+      "version": 1
+    }

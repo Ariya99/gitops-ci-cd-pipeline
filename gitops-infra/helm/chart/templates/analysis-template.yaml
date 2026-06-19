@@ -1,0 +1,27 @@
+{{- if and .Values.rollout.enabled .Values.rollout.canary.analysis.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: {{ include "gitops-app.fullname" . }}-canary
+  labels:
+    {{- include "gitops-app.labels" . | nindent 4 }}
+spec:
+  args:
+    - name: service-name
+      value: {{ include "gitops-app.fullname" . }}
+    - name: success-rate-threshold
+      value: {{ .Values.rollout.canary.analysis.successRate | quote }}
+  metrics:
+    - name: success-rate
+      interval: {{ .Values.rollout.canary.analysis.interval }}
+      count: {{ .Values.rollout.canary.analysis.count }}
+      successCondition: result[0] >= {{ "{{" }} args.success-rate-threshold {{ "}}" }}
+      failureLimit: 1
+      provider:
+        prometheus:
+          address: http://prometheus-kube-prometheus-prometheus.monitoring:9090
+          query: |
+            sum(rate(http_requests_total{service="{{ "{{" }}args.service-name{{ "}}" }}",status!~"5.."}[2m]))
+            /
+            sum(rate(http_requests_total{service="{{ "{{" }}args.service-name{{ "}}" }}"}[2m]))
+{{- end }}

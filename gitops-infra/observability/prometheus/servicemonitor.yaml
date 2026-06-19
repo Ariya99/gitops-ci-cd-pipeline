@@ -1,0 +1,21 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: gitops-app
+  namespace: monitoring
+  labels:
+    release: prometheus
+    app.kubernetes.io/part-of: gitops-ci-cd-pipeline
+spec:
+  namespaceSelector:
+    matchNames:
+      - app-dev
+      - app-staging
+      - app-prod
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: gitops-app
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 30s

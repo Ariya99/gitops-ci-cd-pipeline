@@ -1,0 +1,49 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: gitops-app-alerts
+  namespace: monitoring
+  labels:
+    release: prometheus
+    app.kubernetes.io/part-of: gitops-ci-cd-pipeline
+spec:
+  groups:
+    - name: gitops-app.rules
+      rules:
+        - alert: GitOpsAppHighErrorRate
+          expr: |
+            sum by (namespace, service) (
+              rate(http_requests_total{status=~"5.."}[5m])
+            )
+            /
+            sum by (namespace, service) (
+              rate(http_requests_total[5m])
+            ) > 0.05
+          for: 2m
+          labels:
+            severity: critical
+          annotations:
+            summary: "High 5xx error rate on {{ $labels.service }}"
+            description: "Error rate exceeds 5% for 2 minutes. Consider Argo Rollouts rollback."
+
+        - alert: GitOpsAppDown
+          expr: up{job=~".*gitops-app.*"} == 0
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: "GitOps app target down"
+            description: "Prometheus cannot scrape the application metrics endpoint."
+
+        - alert: GitOpsAppHighLatency
+          expr: |
+            histogram_quantile(0.99,
+              sum by (le, service) (
+                rate(http_request_duration_seconds_bucket[5m])
+              )
+            ) > 1
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "P99 latency above 1s on {{ $labels.service }}"

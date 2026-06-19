@@ -1,0 +1,14 @@
+# Mirror of root workflow — GitHub Actions executes `.github/workflows/ci.yml` at repo root.
+# This file documents the CI pipeline co-located with the application source.
+# See: ../../.github/workflows/ci.yml
+
+name: CI (app reference)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  reference:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Active CI workflow lives at .github/workflows/ci.yml"

@@ -1,0 +1,63 @@
+# Argo Rollouts canary analysis — Prometheus-based auto-rollback
+# Applied per environment when rollout.enabled=true in Helm values.
+# Reference: gitops-infra/helm/chart/templates/rollout.yaml
+
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: gitops-app-canary
+  namespace: app-staging
+spec:
+  args:
+    - name: service-name
+    - name: success-rate-threshold
+      value: "0.99"
+  metrics:
+    - name: success-rate
+      interval: 1m
+      count: 5
+      successCondition: result[0] >= {{ args.success-rate-threshold }}
+      failureLimit: 2
+      provider:
+        prometheus:
+          address: http://prometheus-kube-prometheus-prometheus.monitoring:9090
+          query: |
+            sum(rate(http_requests_total{service="{{args.service-name}}",status!~"5.."}[2m]))
+            /
+            sum(rate(http_requests_total{service="{{args.service-name}}"}[2m]))
+    - name: error-rate
+      interval: 1m
+      count: 5
+      successCondition: result[0] < 0.01
+      failureLimit: 1
+      provider:
+        prometheus:
+          address: http://prometheus-kube-prometheus-prometheus.monitoring:9090
+          query: |
+            sum(rate(http_requests_total{service="{{args.service-name}}",status=~"5.."}[2m]))
+            /
+            sum(rate(http_requests_total{service="{{args.service-name}}"}[2m]))
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: gitops-app-canary
+  namespace: app-prod
+spec:
+  args:
+    - name: service-name
+    - name: success-rate-threshold
+      value: "0.995"
+  metrics:
+    - name: success-rate
+      interval: 30s
+      count: 10
+      successCondition: result[0] >= {{ args.success-rate-threshold }}
+      failureLimit: 1
+      provider:
+        prometheus:
+          address: http://prometheus-kube-prometheus-prometheus.monitoring:9090
+          query: |
+            sum(rate(http_requests_total{service="{{args.service-name}}",status!~"5.."}[1m]))
+            /
+            sum(rate(http_requests_total{service="{{args.service-name}}"}[1m]))
