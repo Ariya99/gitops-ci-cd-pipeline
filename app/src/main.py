@@ -1,9 +1,26 @@
-from fastapi import FastAPI, Response
+import os
+import secrets
+
+from fastapi import Depends, FastAPI, HTTPException, Response, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 
 from src.metrics import REQUEST_COUNT
 
 app = FastAPI(title="GitOps Demo API", version="1.0.0")
+security = HTTPBearer()
+
+API_TOKEN = os.getenv("API_TOKEN")
+
+
+def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)) -> str:
+    if not API_TOKEN or not secrets.compare_digest(credentials.credentials, API_TOKEN):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authentication token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return credentials.credentials
 
 
 @app.get("/health")
@@ -17,7 +34,7 @@ def ready() -> dict[str, str]:
 
 
 @app.get("/api/v1/greeting")
-def greeting() -> dict[str, str]:
+def greeting(token: str = Depends(verify_token)) -> dict[str, str]:
     REQUEST_COUNT.labels(method="GET", endpoint="/api/v1/greeting").inc()
     return {"message": "Hello from GitOps CI/CD pipeline"}
 
