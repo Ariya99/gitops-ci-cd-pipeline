@@ -20,7 +20,7 @@ def test_ready() -> None:
 def test_greeting() -> None:
     response = client.get("/api/v1/greeting")
     assert response.status_code == 200
-    assert "message" in response.json()
+    assert response.json() == {"message": "Hello from GitOps CI/CD pipeline"}
 
 
 def test_metrics() -> None:
