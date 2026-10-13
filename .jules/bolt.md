@@ -1,0 +1,3 @@
+## 2024-05-15 - Fast API Static JSON Serialization Overhead
+**Learning:** Returning dictionaries from FastAPI endpoints triggers the framework's serialization logic, which adds measurable overhead even for simple static responses. However, preserving the OpenAPI documentation requires adding `response_model` to the route decorator.
+**Action:** For highly trafficked endpoints returning static or simple JSON data, instantiate and return `JSONResponse` objects directly while setting `response_model` in the decorator to avoid the serialization performance penalty without losing documentation accuracy.
