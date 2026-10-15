@@ -1,0 +1,3 @@
+## 2023-10-24 - FastAPI Static Dictionary Response Serialization
+**Learning:** Returning dictionaries directly in FastAPI incurs a non-trivial JSON serialization overhead due to its built-in `jsonable_encoder`. Benchmarking showed that for static dictionary endpoints, bypassing this by manually instantiating and returning a `JSONResponse` object cuts the response time roughly in half.
+**Action:** When building static endpoints in FastAPI (like healthchecks or standard greetings), return a `JSONResponse(content=...)` instead of a plain dict, while declaring `response_model=dict[str, str]` to keep the OpenAPI schema accurate without performance penalty.
