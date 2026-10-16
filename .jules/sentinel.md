@@ -1,0 +1,4 @@
+## 2026-10-16 - Add authentication to sensitive endpoint
+**Vulnerability:** The `/api/v1/greeting` endpoint, described as a sensitive endpoint, lacked any form of authentication, exposing its functionality to unauthorized access.
+**Learning:** Even internal or demo APIs often require authentication if they expose sensitive operations or metrics tracking. When fixing this by comparing incoming tokens to a configured secret (e.g., `API_TOKEN`), it's crucial to use constant-time comparison methods like `secrets.compare_digest()` rather than standard string equality (`==`) to prevent timing attacks where attackers could guess the token byte-by-byte.
+**Prevention:** Ensure all non-public endpoints are protected with authentication dependencies (like `Depends(HTTPBearer())`) and verify tokens securely using constant-time comparison functions when checking against stored secrets.
