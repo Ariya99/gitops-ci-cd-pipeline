@@ -1,0 +1,4 @@
+## 2026-10-21 - Add API Authentication
+**Vulnerability:** The `/api/v1/greeting` endpoint lacked authentication. A timing attack was also possible if standard string comparison (`==`) was used to compare the token.
+**Learning:** We need to protect sensitive endpoints with an authentication mechanism like HTTPBearer and ensure tokens are compared using constant-time algorithms (`secrets.compare_digest`) to prevent timing side-channel attacks.
+**Prevention:** Always require authentication on sensitive API endpoints using dependency injection (`Depends`) in FastAPI and strictly use `secrets.compare_digest` for token comparisons.
