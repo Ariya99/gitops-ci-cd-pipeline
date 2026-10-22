@@ -1,0 +1,3 @@
+## 2024-06-25 - Avoid FastAPI serialization overhead in static endpoints
+**Learning:** Returning a new `JSONResponse` directly from a FastAPI endpoint, instead of a dictionary, avoids serialization overhead, which improves performance for static endpoints. It's important to use a new `JSONResponse` each time to prevent mutation bugs from middlewares, and `response_model` in the route decorator should be used to preserve OpenAPI documentation.
+**Action:** When implementing static endpoints in FastAPI applications, always use `JSONResponse` and `response_model` to return the response directly, eliminating the need for Pydantic/FastAPI dictionary serialization.
