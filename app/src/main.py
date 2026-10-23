@@ -1,6 +1,7 @@
-from fastapi import FastAPI, Response
+from fastapi import Depends, FastAPI, Response
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 
+from src.auth import verify_token
 from src.metrics import REQUEST_COUNT
 
 app = FastAPI(title="GitOps Demo API", version="1.0.0")
@@ -16,7 +17,7 @@ def ready() -> dict[str, str]:
     return {"status": "ready"}
 
 
-@app.get("/api/v1/greeting")
+@app.get("/api/v1/greeting", dependencies=[Depends(verify_token)])
 def greeting() -> dict[str, str]:
     REQUEST_COUNT.labels(method="GET", endpoint="/api/v1/greeting").inc()
     return {"message": "Hello from GitOps CI/CD pipeline"}

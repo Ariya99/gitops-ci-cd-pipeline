@@ -1,0 +1,4 @@
+## 2024-10-23 - Add authentication to API endpoints
+**Vulnerability:** The `/api/v1/greeting` endpoint lacked authentication, allowing unauthorized access.
+**Learning:** Implemented HTTPBearer authentication securely by verifying the `API_TOKEN` environment variable. To prevent timing attacks, I used `secrets.compare_digest` for constant-time string comparison. I also ensured that failure states (like missing environment variables) securely return a 401 instead of a 500 error, avoiding leaking internal state.
+**Prevention:** Always require authentication on internal and administrative endpoints. Validate configuration strings with constant-time comparison methods, and fail securely without leaking implementation details.
