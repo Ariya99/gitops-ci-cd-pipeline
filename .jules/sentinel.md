@@ -1,0 +1,4 @@
+## 2023-10-27 - [CRITICAL] Missing API endpoint authentication
+**Vulnerability:** The API endpoints under `/api/v1/...` (specifically `/api/v1/greeting`) were publicly accessible without any authentication.
+**Learning:** The endpoints were unprotected, allowing anyone to access data. Authentication via API_TOKEN using FastAPI's `HTTPBearer` must be used for `/api/v1/...` while leaving `/health`, `/ready` and `/metrics` public. Missing tokens were failing insecurely; they must fail with a 500 error if the configuration is bad, to prevent authentication bypass or unintended access. Use `hmac.compare_digest` to prevent timing attacks.
+**Prevention:** Always require authentication on application data endpoints. Ensure that configuration failures (like missing keys) fail securely (e.g., HTTP 500) rather than falling back to weak states. Use constant-time comparison for secrets.
