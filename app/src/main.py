@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Response
+from fastapi.responses import JSONResponse
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 
 from src.metrics import REQUEST_COUNT
@@ -6,14 +7,16 @@ from src.metrics import REQUEST_COUNT
 app = FastAPI(title="GitOps Demo API", version="1.0.0")
 
 
-@app.get("/health")
-def health() -> dict[str, str]:
-    return {"status": "healthy"}
+@app.get("/health", response_model=dict[str, str])
+def health() -> JSONResponse:
+    # ⚡ Bolt: Return JSONResponse directly to avoid dict serialization overhead
+    return JSONResponse(content={"status": "healthy"})
 
 
-@app.get("/ready")
-def ready() -> dict[str, str]:
-    return {"status": "ready"}
+@app.get("/ready", response_model=dict[str, str])
+def ready() -> JSONResponse:
+    # ⚡ Bolt: Return JSONResponse directly to avoid dict serialization overhead
+    return JSONResponse(content={"status": "ready"})
 
 
 @app.get("/api/v1/greeting")
