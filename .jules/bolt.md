@@ -1,0 +1,1 @@
+## 2026-10-28 - Optimize static endpoints with JSONResponse\n**Learning:** Returning dictionaries from FastAPI endpoints incurs Pydantic serialization overhead.\n**Action:** For static endpoints, return a new `JSONResponse` directly and use `response_model` in the route decorator to preserve OpenAPI documentation, avoiding serialization overhead.
