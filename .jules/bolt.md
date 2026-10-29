@@ -1,0 +1,3 @@
+## 2024-10-29 - FastAPI Static Endpoints JSONResponse Optimization
+**Learning:** Returning a new `JSONResponse` directly in FastAPI static endpoints (like `/health` or `/ready`) avoids serialization overhead compared to returning a dictionary. It's crucial to use `response_model` in the route decorator to preserve OpenAPI documentation, and to return a *new* `JSONResponse` instance each time rather than a global one to prevent mutation bugs from middlewares.
+**Action:** Apply this optimization to static endpoints that return constant JSON structures to improve response times, always ensuring `response_model` is specified.
