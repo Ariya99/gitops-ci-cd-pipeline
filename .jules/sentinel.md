@@ -1,0 +1,4 @@
+## 2024-10-31 - [CRITICAL] Fix missing authentication on API endpoints
+**Vulnerability:** The API endpoint `/api/v1/greeting` was accessible without authentication, exposing internal functionalities publicly.
+**Learning:** The FastAPI application was lacking basic authentication out-of-the-box for its core functionality APIs, which is common in quick start demo architectures.
+**Prevention:** Always implement basic authentication checks (e.g., `HTTPBearer` in FastAPI) for non-public-facing APIs and properly mock authentication in corresponding tests. Ensure failure modes (e.g., missing API keys) degrade securely without exposing internal configurations (e.g., returning 500 without stack trace).
