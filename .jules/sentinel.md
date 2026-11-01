@@ -1,0 +1,4 @@
+## 2023-10-27 - Unauthenticated API Endpoints
+**Vulnerability:** The `/api/v1/greeting` endpoint was missing authentication, allowing anyone to access it.
+**Learning:** In a FastAPI app, endpoints are public by default unless explicitly protected using dependency injection (e.g., `Depends(security)`). When implementing authentication, it's also important to fail securely (e.g., raising a 500 error instead of exposing that an environment variable is missing) and to use secure comparison methods like `secrets.compare_digest` to prevent timing attacks.
+**Prevention:** Ensure all sensitive or non-public endpoints use FastAPI's dependency injection system for authentication (like `HTTPBearer`). Always validate tokens securely and handle configuration errors (like missing environment variables) securely without leaking internal details.
