@@ -1,0 +1,3 @@
+## 2024-11-04 - Fast API Static Endpoint Optimization
+**Learning:** For FastAPI static endpoints, returning a new `JSONResponse` directly instead of a dictionary avoids serialization overhead, improving performance. `response_model` can be used in the route decorator to preserve OpenAPI documentation, and we should avoid using global `JSONResponse` objects to prevent mutation bugs from middlewares.
+**Action:** When creating simple, static responses in FastAPI, always instantiate and return a `JSONResponse` directly and specify `response_model` in the decorator instead of returning dictionaries.
