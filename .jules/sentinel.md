@@ -1,0 +1,4 @@
+## 2026-11-06 - Sentinel: [CRITICAL] Fix missing authentication on API endpoint
+**Vulnerability:** The main API endpoint `/api/v1/greeting` lacked any authentication, leaving it open to unauthorized access.
+**Learning:** In a GitOps/FastAPI context with unauthenticated health checks (`/health`, `/ready`, `/metrics`), it's easy to overlook securing the core business endpoints. Furthermore, when using FastAPI's `HTTPBearer(auto_error=True)`, missing `Authorization` headers raise a 401 (not 403) by default. Missing environment variables must also be handled securely via a 500 error, instead of leaking details.
+**Prevention:** Implement an explicit routing architecture or middleware that requires authentication by default, except for explicitly whitelisted paths. Ensure constant-time string comparison (`secrets.compare_digest`) is always used for token checks.
