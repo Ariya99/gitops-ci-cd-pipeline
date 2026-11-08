@@ -1,0 +1,4 @@
+## 2026-11-08 - Missing API Authentication
+**Vulnerability:** The `/api/v1/greeting` API endpoint was completely unauthenticated, allowing any external traffic to access internal functionality.
+**Learning:** In a fast-moving GitOps environment with multiple layers (ingress, Argo, Gatekeeper), application-level authentication is still critical and was overlooked on new endpoints. Also, when an `API_TOKEN` environment variable isn't configured, failing securely with a generic 500 error prevents leaking internal infrastructure details compared to raising a 401. Finally, utilizing `secrets.compare_digest` is necessary to prevent timing attacks during token verification.
+**Prevention:** Always apply an authentication dependency (e.g., `Depends(verify_token)`) to all API endpoints except explicitly public ones (like `/health`, `/ready`, `/metrics`). Include unit tests verifying `401 Unauthorized` responses for unauthenticated requests.
