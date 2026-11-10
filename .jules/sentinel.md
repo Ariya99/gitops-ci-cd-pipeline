@@ -1,0 +1,4 @@
+## 2024-05-18 - [Fix missing authentication on API endpoints]
+**Vulnerability:** Missing authentication on sensitive endpoint (`/api/v1/greeting`) allowing unauthorized access.
+**Learning:** Found API endpoints missing proper access controls. Furthermore, handling missing configuration data (such as API_TOKEN) must return a safe `HTTP 500` error without leaking underlying configuration details in the error response. Also, using `HTTPBearer` in FastAPI behaves by throwing a `401 Unauthorized` directly when no token is presented.
+**Prevention:** Ensure that all non-public APIs require strict authentication. Use secure token comparison (`secrets.compare_digest`), always fail securely when environment secrets are missing, and cover scenarios with specific tests properly mocking the environment (e.g. `monkeypatch`).
