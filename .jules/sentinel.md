@@ -1,0 +1,4 @@
+## 2024-11-11 - Add authentication to unauthenticated API endpoint
+**Vulnerability:** The `/api/v1/greeting` API endpoint was entirely unauthenticated, allowing any user to access it without authorization.
+**Learning:** Endpoints meant to be restricted were missing authentication checks. Furthermore, if authentication fails due to missing server-side configuration (`API_TOKEN` environment variable), we must be careful to not expose these internal configuration details and gracefully fail with a 500 status. `secrets.compare_digest` must be used for token comparisons to prevent timing attacks.
+**Prevention:** Enforce a strict policy that all main API endpoints (`/api/v1/...`) require authentication using `FastAPI` dependencies like `HTTPBearer`. Additionally, ensure safe fallback logic when internal configuration is missing, and consistently use constant-time comparisons for secrets.
